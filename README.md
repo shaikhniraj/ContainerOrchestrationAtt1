@@ -89,7 +89,7 @@ minikube start --driver=docker --cpus=2 --memory=2048
 kubectl get nodes
 ```
 
-![Minikube start and node Ready](./screenshots/Kubernets-Install.png)
+![Minikube start and node Ready](./submission/screenshots/Kubernets-Install.png)
 
 ## Step 2 – Build and load the images
 
@@ -102,11 +102,11 @@ docker build -t order-service:v1   .\Microservices-Task-main\Microservices\order
 docker build -t gateway-service:v1 .\Microservices-Task-main\Microservices\gateway-service
 ```
 
-![Build of user-service image](./screenshots/docker-build-1.png)
+![Build of user-service image](./submission/screenshots/docker-build-1.png)
 
-![Build of product-service and order-service images](./screenshots/docker-build-2.png)
+![Build of product-service and order-service images](./submission/screenshots/docker-build-2.png)
 
-![Build of gateway-service image](./screenshots/docker-build-3.png)
+![Build of gateway-service image](./submission/screenshots/docker-build-3.png)
 
 The images exist only in the local Docker daemon, so copy them into the Minikube node. The Deployments use `imagePullPolicy: IfNotPresent`, so Kubernetes uses these local images and does not try to pull from a registry.
 
@@ -117,7 +117,7 @@ minikube image load order-service:v1
 minikube image load gateway-service:v1
 ```
 
-![Images loaded into Minikube](./screenshots/image-load.png)
+![Images loaded into Minikube](./submission/screenshots/image-load.png)
 
 ## Step 3 – Deploy with kubectl apply
 
@@ -126,7 +126,7 @@ kubectl apply -f .\submission\deployments\
 kubectl apply -f .\submission\services\
 ```
 
-![kubectl apply output: 4 deployments and 4 services created](./screenshots/kubectl-deploy.png)
+![kubectl apply output: 4 deployments and 4 services created](./submission/screenshots/kubectl-deploy.png)
 
 Check that every pod is `1/1 Running` and that the Services exist:
 
@@ -135,7 +135,7 @@ kubectl get pods -o wide
 kubectl get services
 ```
 
-![Running pods and services](./screenshots/pods.png)
+![Running pods and services](./submission/screenshots/pods.png)
 
 All four pods are `Running` and `READY 1/1`, which means each one passed its readiness probe. The three backend Services are `ClusterIP`; `gateway-service` is `NodePort` (`3003:30003`).
 
@@ -159,7 +159,7 @@ Invoke-RestMethod http://localhost:3003/api/orders
 
 `curl.exe http://localhost:3003/api/users` works as well.
 
-![Gateway returning users and products](./screenshots/service-test.png)
+![Gateway returning users and products](./submission/screenshots/service-test.png)
 
 The users come from `user-service` and the products from `product-service`; the gateway fetched them over the cluster network. `/api/orders` returns an empty list because no order has been created yet.
 
@@ -174,7 +174,7 @@ Invoke-RestMethod -Method Post `
 Invoke-RestMethod http://localhost:3003/api/orders
 ```
 
-![Order created and then listed through the gateway](./screenshots/test-order-services.png)
+![Order created and then listed through the gateway](./submission/screenshots/test-order-services.png)
 
 The `POST` travels host → gateway-service → order-service, and the follow-up `GET` returns the stored order. This confirms inter-service communication in both read and write paths.
 
@@ -212,7 +212,7 @@ kubectl logs deployment/product-service
 kubectl logs deployment/order-service
 ```
 
-![Gateway service log](./screenshots/logs.png)
+![Gateway service log](./submission/screenshots/logs.png)
 
 The provided applications log only their startup line (`Gateway service running on port 3003`) and do not log individual requests. The log shows the container started and is listening; the proof of service-to-service communication is the successful gateway responses in Step 4.
 
