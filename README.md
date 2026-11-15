@@ -189,11 +189,9 @@ kubectl exec deploy/gateway-service -- wget -qO- http://order-service:3002/order
 kubectl exec deploy/order-service   -- wget -qO- http://product-service:3001/health
 ```
 
-Expected output of the first command:
+![Services called directly by Service name from inside the pods](./submission/screenshots/Call%20services%20directly%20by%20Service%20name.png)
 
-```json
-[{"id":1,"name":"John Doe"},{"id":2,"name":"Jane Smith"}]
-```
+The gateway pod resolves `user-service`, `product-service` and `order-service` through cluster DNS and gets the users, the products and the order list (empty at the time of this run). The last command shows the order pod reaching `product-service` in the same way.
 
 ### Option C – NodePort
 
@@ -202,6 +200,12 @@ The gateway is also published on NodePort `30003`. With the Docker driver on Win
 ```powershell
 minikube service gateway-service --url
 ```
+
+![minikube service printing the tunnel URL for the gateway](./submission/screenshots/gateway-service-url.png)
+
+Minikube prints a `http://127.0.0.1:<port>` address. The port is random and changes on every run, and the terminal must stay open while the tunnel is in use. Opening `<url>/api/users` in a browser returns the users through the NodePort Service:
+
+![Browser calling /api/users through the NodePort tunnel](./submission/screenshots/nodeport%20access%20.png)
 
 ## Step 5 – Logs
 
@@ -212,9 +216,9 @@ kubectl logs deployment/product-service
 kubectl logs deployment/order-service
 ```
 
-![Gateway service log](./submission/screenshots/logs.png)
+![Startup logs of all four services](./submission/screenshots/logs.png)
 
-The provided applications log only their startup line (`Gateway service running on port 3003`) and do not log individual requests. The log shows the container started and is listening; the proof of service-to-service communication is the successful gateway responses in Step 4.
+Each service reports that it is listening on its expected port (3003, 3000, 3001, 3002). The provided applications log only this startup line and do not log individual requests, so the proof of service-to-service communication is the successful responses in Step 4.
 
 ## Manifest summary
 
